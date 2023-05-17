@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>人格测试</title>
+    <!-- 导入 Vue 3 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.45/vue.global.prod.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/4.1.6/vue-router.global.min.js"></script>
+
+    <!-- 引入样式 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/element-plus/2.2.27/index.min.css"
+    />
+
+    <!-- 引入组件库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/element-plus/2.2.27/index.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.2/axios.js"></script>
+    <style>
+      html {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 14px;
+      }
+      .welcome {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .my-textarea {
+        width: 100%; /* 设置文本输入框的宽度为100% */
+        margin-top: 10px;
+      }
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 600px; /* 设置图片容器的最大宽度 */
+        margin: 0 auto;
+      }
+
+      .img-responsive {
+        width: 48%; /* 设置图片的宽度 */
+        margin-bottom: 10px;
+      }
+
+      .slider-demo-block {
+        display: flex;
+        align-items: center;
+      }
+      .slider-demo-block .el-slider {
+        margin-top: 0;
+        margin-left: 12px;
+      }
+      .result-row {
+        width: 400px;
+        height: 500px;
+        overflow-y: auto;
+        border: 2px dashed #7ec050;
+        padding: 3px;
+        margin-left: 5px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <router-view></router-view>
+    </div>
+    <script type="module">
+      const { createApp } = Vue;
+      const { ElMessage } = ElementPlus;
+      const { createRouter, createWebHistory } = VueRouter;
+
+      function guid() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+          /[xy]/g,
+          function (c) {
+            var r = (Math.random() * 16) | 0,
+              v = c == 'x' ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+          }
+        );
+      }
+      const five = [
+        '我是一个性格外向，喜欢交际的人',
+        '我是一个心肠柔软，有同情心的人',
+        '我是一个缺乏条理的人',
+        '我是一个从容，善于处理压力的人',
+        '我是一个对艺术没有什么兴趣的人',
+        '我是一个性格坚定自信，敢于表达自己的观点的人',
+        '我是一个为人恭敬、谦虚，尊重他人的人',
+        '我是一个比较懒的人',
+        '我是一个经历挫折后仍能保持积极心态的人',
+        '我是一个对许多不同的事物都感兴趣的人',
+        '我是一个很少觉得兴奋、或者特别想要（做）什么的人',
+        '我是一个常常挑剔别人的毛病的人',
+        '我是一个可信赖的、可靠的人',
+        '我是一个喜怒无常，情绪起伏较多的人',
+        '我是一个善于创造，能找到聪明的方法来做事的人',
+        '我是一个比较安静的人',
+        '我是一个对他人没有什么同情心的人',
+        '我是一个做事有计划有条理的人',
+        '我是一个容易紧张的人',
+        '我是一个着迷与艺术、音乐和文学的人',
+        '我是一个常常处于主导地位，像一个领导一样的人',
+        '我是一个常与他人意见不和的人',
+        '我是一个很难开始行动起来去完成一项任务的人',
+        '我是一个觉得有安全感，对自己满意的人',
+        '我是一个不喜欢知识性或者哲学性强的讨论的人',
+        '我是一个不如别人有活力的人',
+        '我是一个宽宏大量的人',
+        '我是一个有时比较没有责任心的人',
+        '我是一个情绪稳定，不易生气的人',
+        '我是一个几乎没有什么创造性的人',
+        '我是一个有时会害羞、比较内向的人',
+        '我是一个乐于助人，对待别人无私的人',
+        '我是一个习惯让事物保持整洁有序的人',
+        '我是一个时常忧心忡忡，担心很多事情的人',
+        '我是一个重视艺术与审美的人',
+        '我感觉自己很难对他人产生影响',
+        '我是一个有时对人比较粗鲁的人',
+        '我是一个有效率，做事有始有终的人',
+        '我是一个时常觉得悲伤的人',
+        '我是一个思想深刻的人',
+        '我是一个精力充沛的人',
+        '我是一个不相信别人，怀疑别人意图的人',
+        '我是一个可靠的，总是值得他人信赖的人',
+        '我是一个能够控制自己的情绪的人',
+        '我是一个缺乏想象力的人',
+        '我是一个爱说话、健谈的人',
+        '我是一个有时对人冷淡、漠不关心的人',
+        '我是一个乱糟糟的、不爱收拾的人',
+        '我是一个时常觉得郁郁寡欢的人',
+        '我是一个对抽象的概念和想法没什么兴趣的人',
+        '我是一个充满热情的人',
+        '我是一个把人往最好的方面想的人',
+        '我是一个有时候会做出一些不负责任的行为的人',
+        '我是一个情绪多变、容易愤怒的人',
+        '我是一个有创意，能想出新点子的人',
+      ];
+
+      //   const url = 'http://47.97.220.53:8003';
+
+      const WelcomeComponent = {
+        template: /*html*/ `
+            <div class='welcome'>
+							<div>
+								<h1>欢迎您参加AI辅助人格评估的实验</h1>
+								<h3>请阅读下面的知情同意书，并点击"接受"按钮开始实验。
+										整个实验时长大约需要20分钟。
+								</h3>
+							</div>
+
+							<div style='width:1000px;'>
+								<ul>
+									<li>您现在参加的是一个匿名的关于AI辅助人格评估的实验。本研究的目的在于探索人格评估的新方法。实验所得数据均作为研究数据使用，实验数据完全保密。该项研究将帮助我们探索AI与心理学的交叉应用，请您务必认真完成测验。 本研究的结果可能会在学术期刊/书籍上发表，或者用于教学。但是您的个人信息将不会在出现在任何论文或教学中，除非得到您的允许。</li>
+									<li>
+										您的参与完全基于自愿的原则，您可以在实验过程的任何时候关闭页面退出，并且您不会因为退出实验而受到处罚或损失。
+									</li>
+									<li>
+										请确认"我声明我已经被告知本研究的目的、过程、可能的危险和副作用以及潜在的 获益和费用。我的所有问题都得到满意的回答。我已经详细阅读了知情同意书。 我将点击下面的接受按钮表明我愿意并且认真参加本研究。"
+									</li>
+									</ul>
+							</div>
+
+								<div>
+									<el-button :disabled='isAvailabel' type="success" @click="accept">接受</el-button>
+								</div>
+
+								<div><h3>您的测试编号为：{{uniqueId? uniqueId:null}}</h3></div>
+
+								<el-divider />
+
+								<div>
+									<h1>你需要撰写一段文字来描述你自己</h1>
+									<h1>AI将根据你的文字生成一张代表你的图片</h1>
+									<div>
+										<ul>
+											<li>你可以尝试闭上眼睛，想象那些最能代表你自己的特点</li>
+											<li>请尽可能准确、真实地写出最符合自己的描述</li>
+											<li>站在旁观者的角度回看过去的自己，你会如何描述他/她/或是它？</li>
+										</ul>
+									</div>
+
+									<div>
+										<el-input
+											v-model="userDesc"
+											:rows="6"
+											type="textarea"
+											placeholder="请输入你对自己的描述..."
+											class="my-textarea"
+											:disabled='isEditAvailabel'
+										/>
+									</div>
+
+									<div style='margin-top: 5px;'>
+										<el-button :disabled='isEditAvailabel' type="success" @click="handleUserDesc">提交描述</el-button>
+									</div>
+								</div>
+
+									<el-divider />
+								<div>
+									<h3>凭第一直觉选择最符合你自己的图片 (点击图片即可)</h3>
+									<h3>如果无法选择，请重新生成或修改描述</h3>
+
+									<div style='margin-bottom:5px;'>
+										<el-button type="warning" @click="handleUserDesc">重新生成</el-button>
+										<el-button type="danger" @click="handleReviseDesc">修改描述</el-button>
+									</div>
+								</div>
+
+								<div class="container">
+									<div class="row">
+										<img
+											v-for='item in imageItems'
+											:key='item.id'
+											:src="item.download_url"
+											class="img-responsive"
+											@click="handleClickImage(item.id)"
+											v-show='item.visible'
+										/>
+									</div>
+								</div>
+								<h3>你认为这张图有几分能够完全代表你自己</h3>
+								<div class="slider-demo-block" style='width:600px;margin-bottom:10px;'>
+									<el-slider v-model="imageRep" @click='handleImageScore(id, imageRep)' :min='1' :max='10' :marks="singleMarks" />
+								</div>
+
+								<el-divider />
+								<h1>大五人格量表</h1>
+
+								<div style='margin-left:100px;width:500px'>
+									<div v-for='el,index of five' :key='index'>
+										<h4>{{index+1}}: {{el}}</h6>
+										
+										<div class="slider-demo-block">
+											<el-slider v-model="selectedValues[index].score" @click='handleClickScale(index)' :min='1' :max='10' :marks="marks" />
+											<el-checkbox style='margin-left: 10px;' v-model="selectedValues[index].finished" disabled></el-checkbox>
+										</div>
+									</div>
+								</div>
+								<div style='margin-top: 5px;'>
+									<el-button type="success" @click="handleSubmitScale">提交量表</el-button>
+								</div>
+
+								<el-divider />
+								<div>
+									<h3>请选择你认为更准确、更符合你人格的评估结果 (直接点击框内位置即可)</h3>
+									<div style='display:flex; flex-direction: row;'>
+										<div class='row result-row' v-for='item of results' @click='handleSubmitResult(item.id)'>评估结果{{item.id}}: {{item.text}}</div>
+									</div>
+									<h4>你认为该评估结果更好的原因是？</h4>
+									<div>
+										<el-input
+											v-model="userReason"
+											:rows="6"
+											type="textarea"
+											placeholder="请输入你的原因..."
+											class="my-textarea"
+										/>
+									</div>
+
+									<div style='margin-top: 5px;'>
+										<el-button type="success" @click="handleSubmitReason">提交原因</el-button>
+									</div>
+								</div>
+								
+            </div>
+						
+            `,
+        data() {
+          return {
+            isAvailabel: false,
+            isEditAvailabel: false,
+            uniqueId: null,
+            userDesc: '',
+            five: five,
+            singleMarks: {
+              1: '           1\n完全与自己无关',
+              2: '2',
+              3: '3',
+              4: '4',
+              5: '      5\n没有感觉',
+              6: '6',
+              7: '7',
+              8: '8',
+              9: '9',
+              10: '         10\n这就是我本人',
+            },
+            marks: {
+              1: '1',
+              2: '2',
+              3: '3',
+              4: '4',
+              5: '5',
+              6: '6',
+              7: '7',
+              8: '8',
+              9: '9',
+              10: '10',
+            },
+            imageRep: 1,
+            selectedValues: new Array(55).fill(1).map((value, index) => {
+              return { index: index, score: value, finished: false };
+            }),
+            id: null,
+            results: [
+              { id: 1, text: '结果1', selected: false, visible: true },
+              { id: 2, text: '结果2', selected: false, visible: true },
+            ],
+            imageItems: [
+              {
+                id: '1',
+                download_url: 'https://picsum.photos/id/10/2500/1667',
+                visible: true,
+              },
+              {
+                id: '2',
+                download_url: 'https://picsum.photos/id/11/2500/1667',
+                visible: true,
+              },
+              {
+                id: '3',
+                download_url: 'https://picsum.photos/id/12/2500/1667',
+                visible: true,
+              },
+              {
+                id: '4',
+                download_url: 'https://picsum.photos/id/13/2500/1667',
+                visible: true,
+              },
+            ],
+          };
+        },
+        methods: {
+          accept() {
+            this.isAvailabel = true;
+            this.uniqueId = guid();
+            // 1 发送测试编号
+          },
+          handleUserDesc() {
+            this.isEditAvailabel = true;
+            // 2 提交用户描述
+          },
+          handleReviseDesc() {
+            this.isEditAvailabel = false;
+          },
+          handleClickImage(id) {
+            this.id = id;
+            this.imageItems.forEach((item) => {
+              if (id === item.id) {
+                item.visible = true;
+              } else {
+                item.visible = false;
+              }
+            });
+            // 3 点击图片
+          },
+          handleImageScore(id, imageRep) {
+            // 4 点击图片匹配图
+          },
+          handleClickScale(index) {
+            this.selectedValues[index].finished = true;
+            console.log(index);
+            console.log(this.selectedValues[index]['score']);
+          },
+          handleSubmitScale() {
+            console.log(this.selectedValues);
+            // 5 发送大五人格量表结果
+          },
+          handleSubmitResult(id) {
+            // 6 发送点击评估结果
+          },
+          handleSubmitReason() {
+            // 7 发送用户原因
+          },
+        },
+      };
+
+      const routes = [{ path: '/welcome', component: WelcomeComponent }];
+      const router = createRouter({
+        history: createWebHistory(),
+        routes: routes,
+      });
+
+      let app = createApp({});
+      app.use(ElementPlus);
+      app.use(router);
+      app.mount('#app');
+    </script>
+  </body>
+</html>
