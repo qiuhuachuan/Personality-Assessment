@@ -82,15 +82,10 @@
       const { ElMessage } = ElementPlus;
       const { createRouter, createWebHistory } = VueRouter;
 
-      function guid() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
-          /[xy]/g,
-          function (c) {
-            var r = (Math.random() * 16) | 0,
-              v = c == 'x' ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-          }
-        );
+      function text_filtering(text) {
+        let regExp = /[^\u4e00-\u9fa5a-zA-Z0-9]+/g; // 匹配非中文、非字母、非数字的字符
+        let newText = text.replace(regExp, '');
+        return newText;
       }
       const five = [
         '我是一个性格外向，喜欢交际的人',
@@ -201,6 +196,9 @@
 											placeholder="请输入你对自己的描述..."
 											class="my-textarea"
 											:disabled='isEditAvailabel'
+                      show-word-limit
+                      maxlength='100'
+                      minlength='50'
 										/>
 									</div>
 
@@ -281,6 +279,7 @@
             `,
         data() {
           return {
+            url: 'http://',
             isAvailabel: false,
             isEditAvailabel: false,
             uniqueId: null,
@@ -345,17 +344,22 @@
         },
         methods: {
           accept() {
-            this.isAvailabel = true;
-            this.uniqueId = guid();
-            // 1 发送测试编号
+            // 1. 请求 cookie
             axios.get(url).then((res) => {
               if (res.data.responseCode === 200) {
+                this.isAvailabel = true;
               }
             });
           },
           handleUserDesc() {
             this.isEditAvailabel = true;
             // 2 提交用户描述
+            let userDescription = text_filtering(this.userDesc);
+            if (userDescription.length < 50) {
+              // 告诉用户输入的描述太短
+            } else {
+              // 发送后端请求
+            }
           },
           handleReviseDesc() {
             this.isEditAvailabel = false;
