@@ -348,6 +348,10 @@
             this.isAvailabel = true;
             this.uniqueId = guid();
             // 1 发送测试编号
+            axios.get(url).then((res) => {
+              if (res.data.responseCode === 200) {
+              }
+            });
           },
           handleUserDesc() {
             this.isEditAvailabel = true;
